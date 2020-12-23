@@ -1,32 +1,36 @@
 module Syntax
 
 extend lang::std::Layout;
-extend lang::std::Id;
 
 /*
  * Concrete syntax of QL
  */
 
 start syntax Form 
-	= "form" Id \ ReservedKeywords "{" Question* "}"
+	= "form" Id ref "{" Question* qs"}"
 	;
 
 syntax Question
-	= question: Str label Id name \ ReservedKeywords ":" Type type
-	| computed_question: Str label Id \ ReservedKeywords ":" Type "=" Expr
+	= question: Str label Id ref ":" Type
+	| computed_question: Str label Id ref ":" Type "=" Expr
 	| if_then: "if" "(" Expr ")" Block
 	| if_then_else: "if" "(" Expr ")" Block "else" Block
 	; 
 
 syntax Block
-	= "{" Question* "}"
+	= "{"Question* qs"}"
 	;
 
+/* Operator precedence follows Java ruleset 
+ *(https://introcs.cs.princeton.edu/java/11precedence/)
+ */
 syntax Expr 
-	= ref: Id \ ReservedKeywords
-	| Literal
-	> brackets: "(" Expr ")"
-	> right not: "!" Expr
+	= ref: Id ref
+	| \bool: Bool
+	| \str: Str
+	| \int: Int
+	| left brackets: "(" Expr ")"
+	> right not: "!" Expr //greater than all above or only brackets?
 	> left (
 			mul: Expr lhs "*" Expr rhs
 		|	div: Expr lhs "/" Expr rhs
@@ -47,38 +51,47 @@ syntax Expr
 	)
 	> left and: Expr lhs "&&" Expr rhs
 	> left or: Expr lhs "||" Expr rhs
+
 	;
 
 syntax Type 
-	= "boolean"  
-	| "integer" 
+	= "boolean"
+	| "integer"
 	| "string"
 	; 
 
-syntax Literal 
-	= \bool: Bool
-	| \str: Str 
-	| \int: Int 
-	; 
-
-lexical Str
-	= [\"]![\"]*[\"]
-	;
-
-lexical ReservedKeywords
-	= Bool
-	| Type
+keyword Reserved
+	= "true"
+	| "false"
+	| "boolean"
+	| "integer"
+	| "string"
 	| "if"
 	| "else"
 	| "form"
 	;
 
+lexical Id
+	= ([a-zA-Z] !<< // look behind restriction
+		[a-zA-Z][a-zA-Z0-9_]* // character classes
+	!>> [a-zA-Z0-9_]) // lookahead restriction 
+	\ Reserved // subtract keywords
+	;
+
+lexical Str
+	= [\"]![\"]*[\"]
+	;
+
 lexical Int 
-	= [0] 
+	= [0]
 	| [\-]?[1-9][0-9]*
 	;
 
 lexical Bool 
-	= "true" 
+	= "true"
 	| "false"
+	;
+
+layout Layout
+	= [\ \t\n\r]*
 	;
