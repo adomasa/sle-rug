@@ -7,14 +7,14 @@ extend lang::std::Layout;
  */
 
 start syntax Form 
-	= "form" Id ref "{" Question* qs"}"
+	= "form" Id ref "{" Question* qs "}"
 	;
 
 syntax Question
 	= question: Str label Id ref ":" Type
 	| computed_question: Str label Id ref ":" Type "=" Expr
-	| if_then: "if" "(" Expr ")" Block
-	| if_then_else: "if" "(" Expr ")" Block "else" Block
+	| if_then: "if" "(" Expr cond ")" Block
+	| if_then_else: "if" "(" Expr cond ")" Block "else" Block
 	; 
 
 syntax Block
@@ -37,7 +37,7 @@ syntax Expr
 	)
 	> left (
 			add: Expr lhs "+" Expr rhs
-		|	sub: Expr lhs "-" Expr rhs
+		|	diff: Expr lhs "-" Expr rhs
 	)
 	> non-assoc (
 			gt: Expr lhs "\>" Expr rhs
@@ -90,8 +90,4 @@ lexical Int
 lexical Bool 
 	= "true"
 	| "false"
-	;
-
-layout Layout
-	= [\ \t\n\r]*
 	;
