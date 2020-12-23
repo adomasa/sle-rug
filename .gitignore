@@ -3,3 +3,5 @@
 /examples/*.html
 /examples/*.js
 
+*.zip
+.DS_Store
