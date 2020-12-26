@@ -7,7 +7,7 @@ extend lang::std::Layout;
  */
 
 start syntax Form 
-	= "form" Id ref "{" Question* qs "}"
+	= "form" Id name "{" Question* qs "}"
 	;
 
 syntax Question
@@ -25,10 +25,10 @@ syntax Block
  *(https://introcs.cs.princeton.edu/java/11precedence/)
  */
 syntax Expr 
-	= ref: Id ref
-	| \bool: Bool
+	= ref: Id
 	| \str: Str
 	| \int: Int
+	| \bool: Bool
 	| left brackets: "(" Expr ")"
 	> right not: "!" Expr //greater than all above or only brackets?
 	> left (
@@ -74,8 +74,9 @@ keyword Reserved
 lexical Id
 	= ([a-zA-Z] !<< // look behind restriction
 		[a-zA-Z][a-zA-Z0-9_]* // character classes
-	!>> [a-zA-Z0-9_]) // lookahead restriction 
-	\ Reserved // subtract keywords
+		!>> [a-zA-Z0-9_] // lookahead restriction 
+		) 
+	\ Reserved 
 	;
 
 lexical Str
