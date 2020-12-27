@@ -6,16 +6,16 @@ import AST;
 import ParseTree;
 import Boolean;
 import String;
+
 /*
  * A mapping from concrete syntax trees (CSTs) to abstract syntax trees (ASTs)
- *
- * - Use switch to do case distinction with concrete patterns (like in Hack your JS) 
- * - Map regular CST arguments (e.g., *, +, ?) to lists 
- *   (NB: you can iterate over * / + arguments using `<-` in comprehensions or for-loops).
  */
 
 AForm cst2ast(start[Form] sf) {
-	Form f = sf.top; // remove layout before and after form
+	return cst2ast(sf.top); // remove layout before and after form
+}
+
+AForm cst2ast(Form f) {
 	switch (f) {
 		case (Form) `form <Id x> { <Question* qs> }`:
 			return form("<x>",
@@ -61,8 +61,8 @@ AExpr cst2ast(Expr e) {
 	switch (e) {
 		case (Expr) `<Id x>`: // for some reason naming other than x introduce errors
 			return ref(id("<x>", src=x@\loc), src=e@\loc);
-		case (Expr) `<Str s>`:
-			return \str("<s>"[1..-1], src=e@\loc); // eliminate quotes
+		case (Expr) `<Str val>`:
+			return \str("<val>"[1..-1], src=e@\loc); // eliminate quotes
 		case (Expr) `<Int i>`:
 			return \int(toInt("<i>"), src=e@\loc);
 		case (Expr) `<Bool b>`:
