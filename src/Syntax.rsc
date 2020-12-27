@@ -6,7 +6,7 @@ extend lang::std::Layout;
  * Concrete syntax of QL
  */
 
-start syntax Form 
+start syntax Form
 	= "form" Id name "{" Question* qs "}"
 	;
 
@@ -15,16 +15,16 @@ syntax Question
 	| computed_question: Str label Id ref ":" Type "=" Expr
 	| if_then: "if" "(" Expr cond ")" Block
 	| if_then_else: "if" "(" Expr cond ")" Block "else" Block
-	; 
+	;
 
 syntax Block
 	= "{"Question* qs"}"
 	;
 
-/* Operator precedence follows Java ruleset 
+/* Operator precedence follows Java ruleset
  *(https://introcs.cs.princeton.edu/java/11precedence/)
  */
-syntax Expr 
+syntax Expr
 	= ref: Id
 	| \str: Str
 	| \int: Int
@@ -54,11 +54,11 @@ syntax Expr
 
 	;
 
-syntax Type 
+syntax Type
 	= "boolean"
 	| "integer"
 	| "string"
-	; 
+	;
 
 keyword Reserved
 	= "true"
@@ -74,21 +74,21 @@ keyword Reserved
 lexical Id
 	= ([a-zA-Z] !<< // look behind restriction
 		[a-zA-Z][a-zA-Z0-9_]* // character classes
-		!>> [a-zA-Z0-9_] // lookahead restriction 
-		) 
-	\ Reserved 
+		!>> [a-zA-Z0-9_] // lookahead restriction
+		)
+	\ Reserved
 	;
 
 lexical Str
 	= [\"]![\"]*[\"]
 	;
 
-lexical Int 
+lexical Int
 	= [0]
 	| [\-]?[1-9][0-9]*
 	;
 
-lexical Bool 
+lexical Bool
 	= "true"
 	| "false"
 	;

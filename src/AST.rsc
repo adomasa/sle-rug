@@ -6,7 +6,7 @@ module AST
 
 data AForm(loc src = |tmp:///|)
 	= form(str name, list[AQuestion] qs)
-	; 
+	;
 
 data AQuestion(loc src = |tmp:///|)
 	= question					(str label, AId ref, AType \type)

@@ -35,28 +35,25 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
 
 set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 	set[Message] msgs = {};
+	// For duplicates, errrors/warnings are shown on all except first instances
 	switch (q) {
 		case question(label, id(refName, src = loc refSrc), t): {
-			msgs += { warning("Duplicate question label", q.src) 
-							// Show warning only on the second declaration
+			msgs += { warning("Duplicate question label", q.src)
 							| <loc refSrc2, _, label, _> <- tenv, isBefore(refSrc2, refSrc)
 							};
 			msgs += { warning("Duplicate question with different label", q.src) 
-							// Show warning only on the second declaration
-							| <loc refSrc2, refName2, label2, _> <- tenv, label2 != label && refName2 == refName && isBefore(refSrc2, refSrc)
+							| <loc refSrc2, refName, label2, _> <- tenv, label2 != label && isBefore(refSrc2, refSrc)
 							};
 			msgs += { error("Duplicate question name with different type", q.src)
-								| <loc refSrc2, refName, _, t2> <- tenv, getType(t) != t2 && isBefore(refSrc2, refSrc)
-								};
+							| <loc refSrc2, refName, _, t2> <- tenv, getType(t) != t2 && isBefore(refSrc2, refSrc)
+							};
 			}
 		case computedQuestion(label, id(refName, src = loc refSrc), t, expr): {
 			msgs += { warning("Duplicate question label", q.src)
-								// Show warning only on the second declaration
-								| <loc refSrc2, _, label, _> <- tenv, isBefore(refSrc2, refSrc)
-								};
-			msgs += { warning("Duplicate question with different label", q.src) 
-							// Show warning only on the second declaration
-							| <loc refSrc2, refName2, label2, _> <- tenv, label2 != label && refName2 == refName && isBefore(refSrc2, refSrc)
+							| <loc refSrc2, _, label, _> <- tenv, isBefore(refSrc2, refSrc)
+							};
+			msgs += { warning("Duplicate question with different label", q.src)
+							| <loc refSrc2, refName, label2, _> <- tenv, label2 != label && isBefore(refSrc2, refSrc)
 							};
 			msgs += { error("Duplicate question name with different type", q.src)
 							| <loc refSrc2, refName, _, t2> <- tenv, getType(t) != t2 && isBefore(refSrc2, refSrc)
@@ -69,12 +66,12 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 			msgs += { error("Condition has to return boolean", cond.src)
 					| typeOf(cond, tenv, useDef) != tbool()
 					};
-		case ifThenElse(cond, thenQs, elseQs): 
+		case ifThenElse(cond, thenQs, elseQs):
 				msgs += { error("Condition has to return boolean", cond.src)
 						| typeOf(cond, tenv, useDef) != tbool()
 						};
 	}
-	return msgs; 
+	return msgs;
 }
 
 set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
@@ -158,7 +155,7 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
 				};
 		}
 
-	return msgs; 
+	return msgs;
 }
 
 Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
@@ -206,7 +203,7 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
 			return tbool();
 	}
 
-	return tunknown(); 
+	return tunknown();
 }
 
 Type getType(AType t) {

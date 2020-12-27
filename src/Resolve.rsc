@@ -4,7 +4,7 @@ import AST;
 
 /*
  * Name resolution for QL
- */ 
+ */
 
 
 // modeling declaring occurrences of names
