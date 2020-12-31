@@ -41,7 +41,7 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 			msgs += { warning("Duplicate question label", q.src)
 							| <loc refSrc2, _, label, _> <- tenv, isBefore(refSrc2, refSrc)
 							};
-			msgs += { warning("Duplicate question with different label", q.src) 
+			msgs += { warning("Duplicate question with different label", q.src)
 							| <loc refSrc2, refName, label2, _> <- tenv, label2 != label && isBefore(refSrc2, refSrc)
 							};
 			msgs += { error("Duplicate question name with different type", q.src)

@@ -52,7 +52,7 @@ AQuestion cst2ast(Question q) {
 							[cst2ast(q) | Question q <- elseQs],
 							src=q@\loc
 							);
-		default: 
+		default:
 			throw "Unhandled question: <q>";
 	}
 }
@@ -100,7 +100,7 @@ AExpr cst2ast(Expr e) {
 		case (Expr) `<Expr lhs> || <Expr rhs>`:
 			return or(cst2ast(lhs), cst2ast(rhs), src=e@\loc);
 
-		default: 
+		default:
 			throw "Unhandled expression: <e>";
 	}
 }
@@ -113,7 +113,7 @@ AType cst2ast(Type t) {
 			return integer(src = t@\loc);
 		case (Type) `boolean`:
 			return boolean(src = t@\loc);
-		default: 
+		default:
 			throw "Unhandled type: <t>";
 	}
 }
