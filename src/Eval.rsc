@@ -9,10 +9,8 @@ import CST2AST;
 import IO;
 /*
  * Big-step semantics for QL
+ * Eval assumes the form is type- and name-correct
  */
-
-// NB: Eval may assume the form is type- and name-correct.
-
 
 // Semantic domain for expressions (values)
 data Value
@@ -44,7 +42,6 @@ VEnv initialEnv(AForm f) {
 	return venv;
 }
 
-//Todo: what does it do
 // Because of out-of-order use and declaration of questions
 // we use the solve primitive in Rascal to find the fixpoint of venv.
 VEnv eval(AForm f, Input inp, VEnv venv) {
