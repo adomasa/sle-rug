@@ -5,6 +5,7 @@ import Resolve;
 import Message;
 
 import Location;
+import IO;
 
 data Type
 	= tint()
@@ -16,19 +17,17 @@ data Type
 alias TEnv = rel[loc def, str name, str label, Type \type];
 
 TEnv collect(AForm f) {
-	return {<ref.src, ref.val, label, getType(t)> | /question(str label,  AId ref, AType t) := f}
-		+ {<ref.src, ref.val, label, getType(t)> | /computedQuestion(str label,  AId ref, AType t, _) := f};
+	return {<ref.src, ref.val, label, getType(t)> | /question(label,  AId ref, t) := f}
+		+ {<ref.src, ref.val, label, getType(t)> | /computedQuestion(label,  AId ref, t, _) := f};
 }
 
 set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
 	set[Message] msgs = {};
-	for (/AQuestion q := f) {
+
+	for (/AQuestion q := f)
 		msgs += check(q, tenv, useDef);
-	}
-	
-	for (/AExpr e := f) {
+	for (/AExpr e := f)
 		msgs += check(e, tenv, useDef);
-	}
 
 	return msgs;
 }
@@ -37,27 +36,10 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 	set[Message] msgs = {};
 	// For duplicates, errrors/warnings are shown on all except first instances
 	switch (q) {
-		case question(label, id(refName, src = loc refSrc), t): {
-			msgs += { warning("Duplicate question label", q.src)
-							| <loc refSrc2, _, label, _> <- tenv, isBefore(refSrc2, refSrc)
-							};
-			msgs += { warning("Duplicate question with different label", q.src)
-							| <loc refSrc2, refName, label2, _> <- tenv, label2 != label && isBefore(refSrc2, refSrc)
-							};
-			msgs += { error("Duplicate question name with different type", q.src)
-							| <loc refSrc2, refName, _, t2> <- tenv, getType(t) != t2 && isBefore(refSrc2, refSrc)
-							};
-			}
-		case computedQuestion(label, id(refName, src = loc refSrc), t, expr): {
-			msgs += { warning("Duplicate question label", q.src)
-							| <loc refSrc2, _, label, _> <- tenv, isBefore(refSrc2, refSrc)
-							};
-			msgs += { warning("Duplicate question with different label", q.src)
-							| <loc refSrc2, refName, label2, _> <- tenv, label2 != label && isBefore(refSrc2, refSrc)
-							};
-			msgs += { error("Duplicate question name with different type", q.src)
-							| <loc refSrc2, refName, _, t2> <- tenv, getType(t) != t2 && isBefore(refSrc2, refSrc)
-							};
+		case question(_, _, _):
+			msgs += check(q, tenv);
+		case computedQuestion(_, _, t, expr): {
+			msgs += check(q, tenv);
 			msgs += { error("Expression\'s return value has to match question\'s type ", expr.src)
 							| typeOf(expr, tenv, useDef) != getType(t)
 							};
@@ -71,6 +53,30 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 						| typeOf(cond, tenv, useDef) != tbool()
 						};
 	}
+	return msgs;
+}
+
+// Check for common question issues
+set[Message] check(AQuestion q, TEnv tenv) {
+	if (!(/question := q || /computedQuestion := q)) return {};
+	
+	set[Message] msgs = {};
+	
+	refName = q.ref.val;
+	label = q.label;
+	refSrc = q.ref.src;
+	t = q.\type;
+	
+	msgs += { warning("Duplicate question label", q.src)
+					| <loc refSrc2, _, label, _> <- tenv, isBefore(refSrc2, refSrc)
+					};
+					
+	msgs += { warning("Duplicate question with different label", q.src)
+					| <loc refSrc2, refName, label2, _> <- tenv, label2 != q.label && isBefore(refSrc2,  refSrc)
+					};
+	msgs += { error("Duplicate question name with different type", q.src)
+					| <loc refSrc2, refName, _, t2> <- tenv, getType(t) != t2 && isBefore(refSrc2,  refSrc)
+					};
 	return msgs;
 }
 

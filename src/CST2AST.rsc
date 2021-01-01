@@ -16,42 +16,39 @@ AForm cst2ast(start[Form] sf) {
 }
 
 AForm cst2ast(Form f) {
-	switch (f) {
-		case (Form) `form <Id x> { <Question* qs> }`:
-			return form("<x>",
-						[cst2ast(q) | Question q <- qs],
-						src=f@\loc);
-		default:
-			throw "Unhandled form: <f>";
-	}
+	if ((Form) `form <Id x> { <Question* qs> }` := f)
+		return form("<x>",
+								[cst2ast(q) | q <- qs],
+								src=f@\loc);
+	
+	throw "Unhandled form: <f>";
 }
 
 AQuestion cst2ast(Question q) {
 	switch (q) {
-		case (Question)`<Str label> <Id ref> : <Type t>`:
+		case (Question) `<Str label> <Id ref> : <Type t>`:
 			return question("<label>" [1..-1], // eliminate quotes
-							id("<ref>", src=ref@\loc),
-							cst2ast(t),
-							src=q@\loc);
+											id("<ref>", src=ref@\loc),
+											cst2ast(t),
+											src=q@\loc);
 
 		case (Question) `<Str label> <Id ref> : <Type t> = <Expr e>`:
 			return computedQuestion("<label>"[1..-1], // eliminate quotes
-									id("<ref>", src=ref@\loc),
-									cst2ast(t),
-									cst2ast(e),
-									src=q@\loc);
+															id("<ref>", src=ref@\loc),
+															cst2ast(t),
+															cst2ast(e),
+															src=q@\loc);
 
 		case (Question) `if (<Expr cond>) {<Question* qs>}`:
 			return ifThen(cst2ast(cond),
-							[cst2ast(q) | Question q <- qs],
-							src=q@\loc);
+										[cst2ast(q) | Question q <- qs],
+										src=q@\loc);
 
 		case (Question) `if (<Expr cond>) {<Question* qs>} else {<Question* elseQs>}`:
 			return ifThenElse(cst2ast(cond),
-							[cst2ast(q) | Question q <- qs],
-							[cst2ast(q) | Question q <- elseQs],
-							src=q@\loc
-							);
+												[cst2ast(q) | Question q <- qs],
+												[cst2ast(q) | Question q <- elseQs],
+												src=q@\loc);
 		default:
 			throw "Unhandled question: <q>";
 	}
@@ -61,8 +58,8 @@ AExpr cst2ast(Expr e) {
 	switch (e) {
 		case (Expr) `<Id x>`: // for some reason naming other than x introduce errors
 			return ref(id("<x>", src=x@\loc), src=e@\loc);
-		case (Expr) `<Str val>`:
-			return \str("<val>"[1..-1], src=e@\loc); // eliminate quotes
+		case (Expr) `<Str s>`:
+			return \str("<s>"[1..-1], src=e@\loc); // eliminate quotes
 		case (Expr) `<Int i>`:
 			return \int(toInt("<i>"), src=e@\loc);
 		case (Expr) `<Bool b>`:

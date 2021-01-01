@@ -30,7 +30,7 @@ syntax Expr
 	| \int: Int
 	| \bool: Bool
 	| left brackets: "(" Expr ")"
-	> right not: "!" Expr //greater than all above or only brackets?
+	> right not: "!" Expr
 	> left (
 			mul: Expr lhs "*" Expr rhs
 		|	div: Expr lhs "/" Expr rhs
