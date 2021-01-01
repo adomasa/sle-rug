@@ -121,6 +121,11 @@ Value eval(AExpr e, VEnv venv) {
 		case neq(AExpr lhs, AExpr rhs):
 			return not(eq(lhs, rhs, venv));
 
+		case and(AExpr lhs, AExpr rhs):
+			return vbool(eval(lhs, venv).b && vbool(eval(lhs, venv).b));
+		case or(AExpr lhs, AExpr rhs):
+			return vbool(eval(lhs, venv).b || vbool(eval(lhs, venv).b));
+
 		default: throw "Unsupported expression <e>";
 	}
 }
