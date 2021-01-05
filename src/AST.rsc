@@ -11,7 +11,7 @@ data AForm(loc src = |tmp:///|)
 data AQuestion(loc src = |tmp:///|)
 	= question					(str label, AId ref, AType \type)
 	| computedQuestion	(str label, AId ref, AType \type, AExpr expr)
-	| ifThen						(AExpr cond, list[AQuestion] qs)
+	| ifThen						(AExpr cond, list[AQuestion] thenQs)
 	| ifThenElse				(AExpr cond, list[AQuestion] thenQs, list[AQuestion] elseQs)
 	;
 

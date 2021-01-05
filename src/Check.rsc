@@ -44,7 +44,7 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 							| typeOf(expr, tenv, useDef) != getType(t)
 							};
 		}
-		case ifThen(cond, qs):
+		case ifThen(cond, thenQs):
 			msgs += { error("Condition has to return boolean", cond.src)
 					| typeOf(cond, tenv, useDef) != tbool()
 					};

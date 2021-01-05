@@ -39,14 +39,14 @@ AQuestion cst2ast(Question q) {
 															cst2ast(e),
 															src=q@\loc);
 
-		case (Question) `if (<Expr cond>) {<Question* qs>}`:
+		case (Question) `if (<Expr cond>) {<Question* thenQs>}`:
 			return ifThen(cst2ast(cond),
-										[cst2ast(q) | Question q <- qs],
+										[cst2ast(q) | Question q <- thenQs],
 										src=q@\loc);
 
-		case (Question) `if (<Expr cond>) {<Question* qs>} else {<Question* elseQs>}`:
+		case (Question) `if (<Expr cond>) {<Question* thenQs>} else {<Question* elseQs>}`:
 			return ifThenElse(cst2ast(cond),
-												[cst2ast(q) | Question q <- qs],
+												[cst2ast(q) | Question q <- thenQs],
 												[cst2ast(q) | Question q <- elseQs],
 												src=q@\loc);
 		default:
