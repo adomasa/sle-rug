@@ -10,7 +10,24 @@ form taxOfficeExample {
     
   "Did you sell a house in 2010?"
     hasSoldHouse: boolean
+  
+    "Num question"
+    integerNumQ: integer
+    
+    "Str question"
+    stringNumQ: string
    
+   "Computed bool?"
+    computedBool: boolean = true && true
+    
+       
+   "Computed int?"
+    computedInteger: integer = 5 - 2
+    
+       
+   "Computed str?"
+    computedStr: string = "abc"
+    
   if (hasSoldHouse) {
     "What was the selling price?"
       sellingPrice: integer
