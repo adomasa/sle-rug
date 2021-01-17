@@ -51,7 +51,6 @@ syntax Expr
 	)
 	> left and: Expr lhs "&&" Expr rhs
 	> left or: Expr lhs "||" Expr rhs
-
 	;
 
 syntax Type

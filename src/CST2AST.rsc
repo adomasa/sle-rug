@@ -56,7 +56,7 @@ AQuestion cst2ast(Question q) {
 
 AExpr cst2ast(Expr e) {
 	switch (e) {
-		case (Expr) `<Id x>`: // for some reason naming other than x introduce errors
+		case (Expr) `<Id x>`:
 			return ref(id("<x>", src=x@\loc), src=e@\loc);
 		case (Expr) `<Str s>`:
 			return \str("<s>"[1..-1], src=e@\loc); // eliminate quotes

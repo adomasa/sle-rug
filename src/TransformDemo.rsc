@@ -1,11 +1,13 @@
-module Transform
+module TransformDemo
 
 import Syntax;
-import AST;
 import Resolve;
+import AST;
+import CST2AST;
 import ParseTree;
-import List;
-import ParseTree;
+import IO;
+import Resolve;
+import Set;
 /* 
  * Transforming QL forms
  */
@@ -29,6 +31,28 @@ import ParseTree;
  * Write a transformation that performs this flattening transformation.
  *
  */
+ 
+ void main() {
+  tax = parse(#Form, |project://sle-rug/examples/tax.myql|);
+  atax = cst2ast(tax);
+  println(flatten(atax));
+
+	refGraph = resolve(atax);
+	useDef = refGraph.useDef;
+	use = uses(atax);
+	println("");
+  //println(rename(tax, getSrc(tax.qs[2]), "newName", useDef));
+  <a, b> = getOneFrom(use);
+  println(rename(tax, a, "newName", useDef));
+}
+
+loc getSrc(Question q) {
+	switch (q) {
+		case (Question) `<Str _> <Id ref> : <Type _>`:
+			return ref@\loc;
+		}
+}
+
 
  AForm flatten(AForm f) {
 	return form(f.name, ([] | it + flatten(q)| AQuestion q <- f.qs));
@@ -52,8 +76,7 @@ list[AQuestion] flatten(AQuestion q, list[AExpr] conds = [\bool(true)]) {
 }
 
 AExpr merge(list[AExpr] conds) {
-	// merge conditions in reverse list order
-	return (last(conds) | and(it, conds[revPos]) | revPos <- [size(conds) - 2..0]);
+	return (last(conds) | and(it, conds[revNum]) | revNum <- [size(conds)-2..0]);
 }
 
 /* Rename refactoring:
@@ -62,7 +85,7 @@ AExpr merge(list[AExpr] conds) {
  * Use the results of name resolution to find the equivalence class of a name.
  *
  */
-start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDefs) {
+Form rename(Form f, loc useOrDef, str newName, UseDef useDefs) {
 	newId = parseIdName(newName, f);
 	instances = findInstances(useOrDef, useDefs);
 
@@ -91,9 +114,10 @@ set[loc] findInstances(loc target, UseDef useDefs) {
 	return {target};
 }
 
-Id parseIdName(str refName, start[Form] f) {
+Id parseIdName(str refName, Form f) {
 	if (/Id id := f, id == refName) {
 		throw "<refName> name is already in use";
 	}
 	return parse(#Id, refName);
 }
+

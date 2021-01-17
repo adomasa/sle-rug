@@ -17,8 +17,8 @@ data Type
 alias TEnv = rel[loc def, str name, str label, Type \type];
 
 TEnv collect(AForm f) {
-	return {<ref.src, ref.val, label, getType(t)> | /question(label,  AId ref, t) := f}
-		+ {<ref.src, ref.val, label, getType(t)> | /computedQuestion(label,  AId ref, t, _) := f};
+	return { <ref.src, ref.val, label, getType(t)> | /question(label, AId ref, t) := f }
+		+ { <ref.src, ref.val, label, getType(t)> | /computedQuestion(label, AId ref, t, _) := f };
 }
 
 set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
@@ -26,8 +26,10 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
 
 	for (/AQuestion q := f)
 		msgs += check(q, tenv, useDef);
+		// msgs = (msgs| it + check(q, tenv, useDef) | /AQuestion q := f)
 	for (/AExpr e := f)
 		msgs += check(e, tenv, useDef);
+		// msgs = (msgs| it + check(e, tenv, useDef) | /AExpr e := f)
 
 	return msgs;
 }
@@ -108,7 +110,7 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
 				};
 		case add(AExpr lhs, AExpr rhs):
 			msgs +=
-				{ error("Operands of <typeOf(lhs, tenv, useDef)>\"+\" <typeOf(rhs, tenv, useDef)>should be integers", e.src)
+				{ error("Operands of \"+\" should be integers", e.src)
 				| tint() != typeOf(lhs, tenv, useDef) || tint() != typeOf(rhs, tenv, useDef)
 				};
 		case diff(AExpr lhs, AExpr rhs):
