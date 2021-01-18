@@ -6,19 +6,19 @@ import Resolve;
 import ParseTree;
 import List;
 import ParseTree;
-/* 
+/*
  * Transforming QL forms
  */
- 
- 
+
+
 /* Normalization:
  *  wrt to the semantics of QL the following
- *     q0: "" int; 
- *     if (a) { 
- *        if (b) { 
- *          q1: "" int; 
- *        } 
- *        q2: "" int; 
+ *     q0: "" int;
+ *     if (a) {
+ *        if (b) {
+ *          q1: "" int;
+ *        }
+ *        q2: "" int;
  *      }
  *
  *  is equivalent to
@@ -31,30 +31,40 @@ import ParseTree;
  */
 
  AForm flatten(AForm f) {
-	return form(f.name, ([] | it + flatten(q)| AQuestion q <- f.qs));
+	return form(f.name, ([] | it + flatten(q, [])| AQuestion q <- f.qs));
 }
 
-list[AQuestion] flatten(AQuestion q, list[AExpr] conds = [\bool(true)]) {
+list[AQuestion] flatten(AQuestion q, list[AExpr] conds) {
 	if (q has label) {
 		return [ifThen(merge(conds), [q])];
 	}
 	
 	list[AQuestion] qs = [];
 	if (q has thenQs) {
-		qs = (qs | it + flatten(tq, conds = conds + [q.cond]) | tq <- q.thenQs);
+		qs = (qs | it + flatten(tq, conds + [q.cond]) | tq <- q.thenQs);
 	}
 	if (q has elseQs) {
-		qs = (qs | it + flatten(eq, conds = conds + [not(q.cond)]) | eq <- q.elseQs);
+		qs = (qs | it + flatten(eq, conds + [not(q.cond)]) | eq <- q.elseQs);
 	}
 	
 	return qs;
 
 }
-
 AExpr merge(list[AExpr] conds) {
-	// merge conditions in reverse list order
-	return (last(conds) | and(it, conds[revPos]) | revPos <- [size(conds) - 2..0]);
+ AExpr expr = \bool(true);
+
+  for(c <- conds) {
+    expr = and(expr, c);
+  }
+
+  return expr;
 }
+
+//AExpr merge(list[AExpr] conds) {
+//if (conds == []) return \bool(true);
+//	// merge conditions in reverse list order
+//return (last(conds) | and(it, conds[revPos]) | revPos <- [size(conds) - 2..0]);
+//}
 
 /* Rename refactoring:
  *
@@ -67,22 +77,22 @@ start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDefs) {
 	instances = findInstances(useOrDef, useDefs);
 
  return visit (f) {
-		case (Question) `<Str s> <Id oldId>: <Type t>` 
+		case (Question) `<Str s> <Id oldId>: <Type t>`
 				=> (Question) `<Str s> <Id newId> : <Type t>`
 			when oldId@\loc in instances
-		case (Question) `<Str s> <Id oldId> : <Type t> = <Expr e>` 
+		case (Question) `<Str s> <Id oldId> : <Type t> = <Expr e>`
 				=> (Question) `<Str s> <Id newId> : <Type t> = <Expr e>`
 			when oldId@\loc in instances
-		case (Expr) `<Id oldId>` 
+		case (Expr) `<Id oldId>`
 				=> (Expr) `<Id newId>`
 			when oldId@\loc in instances
-	}; 
+	};
 }
 
 set[loc] findInstances(loc target, UseDef useDefs) {
 	if (<target, def> <- useDefs) { //ref instance
 		return target + {def} + { use | <use, def> <- useDefs };
-	} 
+	}
 
 	if (<_, target> <- useDefs) { // def instance
 		return target + { use | <use, target> <- useDefs };

@@ -140,7 +140,7 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
 				{ error("Operands of \"\<=\" should be integers", e.src)
 				| tint() != typeOf(lhs, tenv, useDef) || tint() != typeOf(rhs, tenv, useDef)
 				};
-		case eq(AExpr lhs, AExpr rhs):
+		case eql(AExpr lhs, AExpr rhs):
 				msgs +=
 				{ error("Operands of \"==\" should be of the same type", e.src)
 				| typeOf(lhs, tenv, useDef) != typeOf(rhs, tenv, useDef)
@@ -200,7 +200,7 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
 			return tbool();
 		case leq(_, _):
 			return tbool();
-		case eq(_, _):
+		case eql(_, _):
 			return tbool();
 		case neq(_, _):
 			return tbool();

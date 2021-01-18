@@ -8,21 +8,20 @@ import List;
 
 /*
  * A compiler for QL to HTML and Javascript
- * 	we assume the form is type- and name-correct 
+ * 	we assume the form is type- and name-correct
  */
- 
+
  /* - use string templates to generate Javascript
  * - use any client web framework (e.g. Vue, React, jQuery, whatever) you like for event handling
  * - if needed, use the name analysis to link uses to definitions
  */
-
 void compile(AForm f) {
 	writeFile(f.src[extension="js"].top, ast2js(f));
 	writeFile(f.src[extension="html"].top, toString(ast2html(f)));
 }
 
 HTML5Node ast2html(AForm f) {
-	return 
+	return
 		html(
 			head(
 				title(f.name),
@@ -73,7 +72,7 @@ HTML5Node ast2html(AQuestion q) {
 		case i: ifThen(AExpr cond, list[AQuestion] thenQs): {
 			str ref = resolveQuestionContainerId(i);
 			HTML5Node container = div(id(ref));
-			container.kids += [resolveQuestionContainer(ref+"-then", thenQs)];
+			container.kids += [resolveQuestionContainer(ref + "-then", thenQs)];
 
 			return container;
 		}
@@ -82,8 +81,8 @@ HTML5Node ast2html(AQuestion q) {
 			str ref = resolveQuestionContainerId(i);
 			HTML5Node container = div(id(ref));
 
-			container.kids += [resolveQuestionContainer(id+"-then", thenQs),
-												resolveQuestionContainer(id+"-else", elseQs)];
+			container.kids += [resolveQuestionContainer(ref + "-then", thenQs),
+												resolveQuestionContainer(ref + "-else", elseQs)];
 
 			return container;
 		}
@@ -106,7 +105,7 @@ str resolveQuestionContainerId(AQuestion i) {
 HTML5Node resolveInputFields(AType t, str label, AId ref, bool computed=false) {
 	switch (t) {
 		case boolean(): {
-			inputField =  select(
+			inputField = select(
 							required("true"),
 							id("<ref.val>-input"),
 							name(label),
@@ -153,39 +152,38 @@ HTML5Node resolveInputFields(AType t, str label, AId ref, bool computed=false) {
 	
 }
 
+// -----------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------
 
 str ast2js(AForm f) {
 	list[str] initialComputations = [];
 	str content = "";
-	// map of def: uses, by using string identifiers
-	map[str, list[str]] defUses = ();
+	// Map of def: uses, by using string representations
+	map[str, list[str]] defUses = ( () |it + (ref: []) | <_, ref> <- uses(f) );
 	
-	// initialisation
-	for (<_, ref> <- uses(f)) {
-		defUses += (ref: []);
-	}
-	
-	for (/computedQuestion(str label, AId ref, AType t, AExpr expr) := f) {		
-		resultFormat = t := boolean() ? "result.toString()" : "result";
-		
+	for (/computedQuestion(str label, AId ref, AType t, AExpr expr) := f) {
 		exprRefs = [x | /ref(id(str x)) := expr];
 		
-		if (isEmpty(exprRefs)) initialComputations += ref.val;
-		for (str exprRef <- exprRefs) {
-			defUses[exprRef] += [ref.val];
+		// If there is no references in computed expression
+		// We will precompute the result
+		if (isEmpty(exprRefs)) {
+			initialComputations += ref.val;
+		} else {
+			for (str exprRef <- exprRefs) {
+				defUses[exprRef] += [ref.val];
+			}
 		}
 		
-		content += "function compute_<ref.val>() {"
+		content += "function compute_<ref.val>() {\n"
 			+ validateDependentFieldValues(exprRefs)
-			+"\n\tvar result = <expr2js(expr)>;\n"
 			// We use select for boolean questions
-			+ "\t$(\"#<ref.val>-input\").val(<resultFormat>);\n}\n\n";
+			+ "\t$(\"#<ref.val>-input\").val(<thisOrWrappedBool(expr2js(expr), t)>);\n}\n\n";
 	}
 	
-	for (AQuestion q <- f.qs, q has qs) {
+
+	for (/AQuestion q := f, q has thenQs) {
 		// gather refs from condition expr
 		exprRefs = [ x | /ref(id(str x)) := q.cond];
-		
 		for (exprRef <- exprRefs) {
 			defUses[exprRef] += "<q.src.offset>";
 		}
@@ -197,13 +195,13 @@ str ast2js(AForm f) {
 		// we use src offset as an id
 		content += "function compute_<q.src.offset>() {\n"
 			+ validateDependentFieldValues(exprRefs)
-			+ "\tif (<expr2js(q.cond)> == \"true\") {\n"
+			+ "\tif (<expr2js(q.cond)>) {\n"
  			+ "\t\t$(\"#<q.src.offset>-then\").show(); \n\t\t$(\"#<q.src.offset>-else\").hide() \n\t}\n"
-			+ "\telse {\n\t\t$(\"#<q.src.offset>-else\").show(); \n" 
-			+ "\t\t$(\"#<q.src.offset>-then\").hide();\n\t}\n\n";
-		content += "}\n\n";
+			+ "\telse {\n\t\t$(\"#<q.src.offset>-else\").show(); \n"
+			+ "\t\t$(\"#<q.src.offset>-then\").hide();\n\t}\n}\n\n";
 	}
 	
+	content += boolValueConversionFunction();
 	// initial function	
 	content += "$(function () {\n";
 	
@@ -218,8 +216,8 @@ str ast2js(AForm f) {
 		
 		for (use <- defUses[ref]) {
 			content += "\tcompute_<use>();\n";
-		;
 		}
+		
 		content += "});\n\n";
 	}
 	
@@ -228,23 +226,48 @@ str ast2js(AForm f) {
 	return content;
 }
 
+str getEventListeners(defUses, ref) {
+	str eventListeners = "";
+	for (ref <- defUses, !isEmpty(defUses[ref])) {
+		eventListeners += "\n$(\"#<ref>-input\").change(function() {\n";
+		
+		for (use <- defUses[ref]) {
+			eventListeners += "\tcompute_<use>();\n";
+		}
+		eventListeners += "});\n\n";
+	}
+	return eventListeners;
+}
+
+str boolValueConversionFunction() {
+		return "function thisOrConvertedBool(val) {\n"
+			+ "\tif (val === \'true\') return true;\n"
+ 			+ "\tif (val === \'false\') return false;\n"
+ 			+ "\treturn val; \n}\n\n";
+}
+
 // Every computation function has a precondition:
-// Used references should have defined value
+// References should have a defined value
 str validateDependentFieldValues(list[str] refs){
 	if (isEmpty(refs)) return "";
 	
-	str js_content =  "\tif (";
-	for (ref <- refs)
-		// if value is undefined, null, "", terminate function
-		js_content += "!Boolean($(\"#<ref>-input\"))<(ref != last(refs)) ? "||" : ")">";
-	js_content += " return;\n";
-	return js_content;
+	// If value is undefined, null, "", terminate function
+	str js_content = "\tif (";
+	for (ref <- refs) {
+		js_content += "!$(\"#<ref>-input\").val() <(ref != last(refs)) ? "||" : ")">";
+	}
+	return js_content + " return;\n";;
+}
+
+// Make bool value compatible with select html element
+str thisOrWrappedBool(str result, AType t) {
+	return t := boolean() ? "(<result>).toString()" : result;
 }
 
 str expr2js(AExpr e) {
 	switch (e) {
 		case ref(id(str x)): {
-			return "$(\'#<x>-input\').val()";
+			return "thisOrConvertedBool($(\'#<x>-input\').val())";
 		}
 			
 		case \bool(bool b):
@@ -275,7 +298,7 @@ str expr2js(AExpr e) {
 		case leq(AExpr lhs, AExpr rhs):
 			return "(<expr2js(lhs)> \<= <expr2js(rhs)>)";
 
-		case eq(AExpr lhs, AExpr rhs):
+		case eql(AExpr lhs, AExpr rhs):
 			return "(<expr2js(lhs)>) == (<expr2js(rhs)>)";
 
 		case neq(AExpr lhs, AExpr rhs):

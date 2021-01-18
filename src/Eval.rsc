@@ -105,7 +105,7 @@ Value eval(AExpr e, VEnv venv) {
 			return vbool(eval(lhs, venv).i < eval(rhs, venv).i);
 		case leq(AExpr lhs, AExpr rhs):
 			return vbool(eval(lhs, venv).i <= eval(rhs, venv).i);
-		case eq(AExpr lhs, AExpr rhs): {
+		case eql(AExpr lhs, AExpr rhs): {
 			lval = eval(lhs, venv);
 			rval = eval(rhs, venv);
 			// Under correct type assumption

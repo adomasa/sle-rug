@@ -10,19 +10,25 @@ import Resolve;
 import Set;
 import Transform;
 
- 
- void main() {
-  tax = parse(#start[Form], |project://sle-rug/examples/tax.myql|);
-  atax = cst2ast(tax);
-  println(flatten(atax));
 
-	refGraph = resolve(atax);
-	useDef = refGraph.useDef;
-	use = uses(atax);
-	println("");
-  //println(rename(tax, getSrc(tax.qs[2]), "newName", useDef));
-  <a, b> = getOneFrom(use);
-  println(rename(tax, a, "newName", useDef));
+void main() {
+	tax = parse(#start[Form], |project://sle-rug/examples/tax.myql|);
+	atax = cst2ast(tax);
+	println(flatten(atax));
+
+	//refGraph = resolve(atax);
+	//useDef = refGraph.useDef;
+	//use = uses(atax);
+	//println("");
+ // //println(rename(tax, getSrc(tax.qs[2]), "newName", useDef));
+ // <a, b> = getOneFrom(use);
+ // println(rename(tax, a, "newName", useDef));
+}
+
+void demo() {
+	tax = parse(#start[Form], |project://sle-rug/examples/tax.myql|);
+	atax = cst2ast(tax);
+	println(flatten(atax));
 }
 
 loc getSrc(Question q) {

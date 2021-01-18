@@ -46,7 +46,7 @@ syntax Expr
 		|	leq: Expr lhs "\<=" Expr rhs
 	)
 	> non-assoc (
-			eq: Expr lhs "==" Expr rhs
+			eql: Expr lhs "==" Expr rhs
 		|	neq: Expr lhs "!=" Expr rhs
 	)
 	> left and: Expr lhs "&&" Expr rhs

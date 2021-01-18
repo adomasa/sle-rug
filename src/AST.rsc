@@ -31,7 +31,7 @@ data AExpr(loc src = |tmp:///|)
 	| geq				(AExpr lhs, AExpr rhs)
 	| lt				(AExpr lhs, AExpr rhs)
 	| leq				(AExpr lhs, AExpr rhs)
-	| eq				(AExpr lhs, AExpr rhs)
+	| eql				(AExpr lhs, AExpr rhs)
 	| neq				(AExpr lhs, AExpr rhs)
 
 	| and				(AExpr lhs, AExpr rhs)

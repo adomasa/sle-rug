@@ -1,0 +1,62 @@
+form taxOfficeExample { 
+  "Did you buy a house in 2010?"
+    hasBoughtHouse: boolean
+    
+   
+    // akjsdhakjshdkjsa
+    
+    "Bool question no uses"
+    hasMaintLoan: boolean
+    
+   "Bool question has uses"
+    hasSoldHouse: boolean
+  
+    "Num question has uses"
+    integerNumQ: integer
+    
+    "Num question no uses"
+    integerNumQ2: integer
+    
+    "Str question used in condition"
+    stringQ: string
+    
+    "Str question no uses"
+    stringNo: string
+   
+   "Computed bool with ref"
+    computedBool: boolean = hasSoldHouse && true
+    
+      	
+   "Computed int with ref"
+    computedInteger: integer = integerNumQ - 2
+       
+   "Pre-computed str"
+    computedStr: string = "abc"
+    
+  if (stringQ != "abc") {
+    "Innner cond quest"
+      innerQSwitch: boolean
+    "ThenCond q1"
+      int1: integer
+    "ThenCond q2"
+      int2: integer
+    "ThenCond computed q3"
+      valueResidue: integer = int1 - int2
+    if (innerQSwitch) {
+    	"Then inner q1"
+      	innertint1: integer
+    	"Then inner q2 "
+      	innertint2: integer
+    } else {
+    	"Else inner q1"
+      	innerint1: integer
+    	"Else inner q2 "
+      	innerint2: integer
+    }
+  } else {
+      "Else q1"
+      sellingsPrice: integer
+    	"Else q2 "
+      privateDevbt: integer
+  }
+}
