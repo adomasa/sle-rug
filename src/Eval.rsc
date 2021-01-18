@@ -106,21 +106,10 @@ Value eval(AExpr e, VEnv venv) {
 		case leq(AExpr lhs, AExpr rhs):
 			return vbool(eval(lhs, venv).i <= eval(rhs, venv).i);
 		case eql(AExpr lhs, AExpr rhs): {
-			lval = eval(lhs, venv);
-			rval = eval(rhs, venv);
-			// Under correct type assumption
-			switch(lval) {
-				case vint(_):
-					return vbool(lval.i == rval.i);
-				case vbool(_):
-					return vbool(lval.b == rval.b);
-				case vstr(_):
-					return vbool(lval.s == rval.s);
-			}
+			return vbool(eval(lhs, venv) == eval(rhs, venv));
 		}
 		case neq(AExpr lhs, AExpr rhs):
-			return not(eq(lhs, rhs, venv));
-
+			return vbool(eval(lhs, venv) != eval(rhs, venv));
 		case and(AExpr lhs, AExpr rhs):
 			return vbool(eval(lhs, venv).b && vbool(eval(lhs, venv).b));
 		case or(AExpr lhs, AExpr rhs):

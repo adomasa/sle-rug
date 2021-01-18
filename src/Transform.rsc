@@ -51,20 +51,13 @@ list[AQuestion] flatten(AQuestion q, list[AExpr] conds) {
 
 }
 AExpr merge(list[AExpr] conds) {
- AExpr expr = \bool(true);
+	AExpr expr = \bool(true);
 
-  for(c <- conds) {
-    expr = and(expr, c);
-  }
-
-  return expr;
+	for(cond <- conds) {
+		expr = and(expr, cond);
+	}
+	return expr;
 }
-
-//AExpr merge(list[AExpr] conds) {
-//if (conds == []) return \bool(true);
-//	// merge conditions in reverse list order
-//return (last(conds) | and(it, conds[revPos]) | revPos <- [size(conds) - 2..0]);
-//}
 
 /* Rename refactoring:
  *
