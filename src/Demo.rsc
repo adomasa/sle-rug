@@ -52,7 +52,8 @@ void flattenDemo() {
 void evalDemo() {
 	demo = parse(#start[Form], |project://sle-rug/examples/demo.myql|);
 	ademo = cst2ast(demo);
-	eval(ademo, input("hasMaintLoan", vbool(false)), initialEnv(ademo));
+	evalresult = eval(ademo, input("integerNumQ", vint(5)), initialEnv(ademo));
+	println(evalresult);
 }
 
 loc getSrc(Question q) {
