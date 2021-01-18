@@ -7,3 +7,5 @@
 .DS_Store
 src/Eval2.rsc
 src/test.rsc
+*.js
+*.html
