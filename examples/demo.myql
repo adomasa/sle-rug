@@ -1,62 +1,62 @@
 form taxOfficeExample { 
-  "Did you buy a house in 2010?"
+  "Q1. Did you buy a house in 2010?"
     hasBoughtHouse: boolean
     
    
     // akjsdhakjshdkjsa
     
-    "Bool question no uses"
+    "Q2. Bool question no uses"
     hasMaintLoan: boolean
     
-   "Bool question has uses"
+   "Q3. Bool question has uses"
     hasSoldHouse: boolean
   
-    "Num question has uses"
+    "Q4. Num question has uses"
     integerNumQ: integer
     
-    "Num question no uses"
+    "Q5. Num question no uses"
     integerNumQ2: integer
     
-    "Str question used in condition"
+    "Q6. Str question used in condition (!='abc')"
     stringQ: string
     
-    "Str question no uses"
+    "Q7. Str question no uses"
     stringNo: string
    
-   "Computed bool with ref"
+   "Q8. Computed bool with ref (Q3 and true)"
     computedBool: boolean = hasSoldHouse && true
     
       	
-   "Computed int with ref"
+   "Q9. Computed int with ref (Q4 - 2)"
     computedInteger: integer = integerNumQ - 2
        
-   "Pre-computed str"
+   "Q10. Pre-computed str"
     computedStr: string = "abc"
     
   if (stringQ != "abc") {
-    "Innner cond quest"
+    "Q11. Innner cond switch"
       innerQSwitch: boolean
-    "ThenCond q1"
+    "Q12. ThenCond q1"
       int1: integer
-    "ThenCond q2"
+    "Q13. ThenCond q2"
       int2: integer
-    "ThenCond computed q3"
+    "Q14 ThenCond computed Q12 - Q13"
       valueResidue: integer = int1 - int2
     if (innerQSwitch) {
-    	"Then inner q1"
+    	"Q15. Then inner q1 from Q11"
       	innertint1: integer
-    	"Then inner q2 "
+    	"Q16. Then inner q2 from Q11"
       	innertint2: integer
     } else {
-    	"Else inner q1"
+    	"Q17. Else inner q1 from Q11"
       	innerint1: integer
-    	"Else inner q2 "
+    	"Q18. Else inner q2 from Q11"
       	innerint2: integer
     }
   } else {
-      "Else q1"
+      "Q19. Else q1"
       sellingsPrice: integer
-    	"Else q2 "
+    	"Q20. Else q2 "
       privateDevbt: integer
   }
 }

@@ -11,7 +11,7 @@ import List;
  * 	we assume the form is type- and name-correct
  */
 
- /* - use string templates to generate Javascript
+/* - use string templates to generate Javascript
  * - use any client web framework (e.g. Vue, React, jQuery, whatever) you like for event handling
  * - if needed, use the name analysis to link uses to definitions
  */
@@ -26,9 +26,7 @@ HTML5Node ast2html(AForm f) {
 			head(
 				title(f.name),
 				script(src("https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js")),
-				script(src("<f.src[extension="js"].file>")),
-				link(\rel("stylesheet"), href(""))
-				
+				script(src("<f.src[extension="js"].file>"))
 			),
 			body(
 				h1(f.name),
@@ -191,7 +189,7 @@ str ast2js(AForm f) {
 		if (isEmpty(exprRefs)) initialComputations += "<q.src.offset>";
 		
 		// conditional question blocks
-		// since no id is defined for then
+		// since no id is defined for then/else blocks
 		// we use src offset as an id
 		content += "function compute_<q.src.offset>() {\n"
 			+ validateDependentFieldValues(exprRefs)

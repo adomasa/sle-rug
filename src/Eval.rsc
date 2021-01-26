@@ -44,6 +44,7 @@ VEnv initialEnv(AForm f) {
 
 // Because of out-of-order use and declaration of questions
 // we use the solve primitive in Rascal to find the fixpoint of venv.
+// I.e., repeating eval as long as it causes changes
 VEnv eval(AForm f, Input inp, VEnv venv) {
 	return solve (venv) {
 		venv = evalOnce(f, inp, venv);

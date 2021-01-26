@@ -39,6 +39,7 @@ syntax Expr
 			add: Expr lhs "+" Expr rhs
 		|	diff: Expr lhs "-" Expr rhs
 	)
+	// No defined behavior when used in sequence
 	> non-assoc (
 			gt: Expr lhs "\>" Expr rhs
 		|	geq: Expr lhs "\>=" Expr rhs

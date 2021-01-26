@@ -26,17 +26,14 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
 
 	for (/AQuestion q := f)
 		msgs += check(q, tenv, useDef);
-		// msgs = (msgs| it + check(q, tenv, useDef) | /AQuestion q := f)
 	for (/AExpr e := f)
 		msgs += check(e, tenv, useDef);
-		// msgs = (msgs| it + check(e, tenv, useDef) | /AExpr e := f)
 
 	return msgs;
 }
 
 set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 	set[Message] msgs = {};
-	// For duplicates, errrors/warnings are shown on all except first instances
 	switch (q) {
 		case question(_, _, _):
 			msgs += check(q, tenv);
@@ -69,6 +66,7 @@ set[Message] check(AQuestion q, TEnv tenv) {
 	refSrc = q.ref.src;
 	t = q.\type;
 	
+	// For duplicates, errrors/warnings are shown on all except first instances
 	msgs += { warning("Duplicate question label", q.src)
 					| <loc refSrc2, _, label, _> <- tenv, isBefore(refSrc2, refSrc)
 					};

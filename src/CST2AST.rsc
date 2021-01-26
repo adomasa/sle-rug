@@ -65,7 +65,8 @@ AExpr cst2ast(Expr e) {
 		case (Expr) `<Bool b>`:
 			return \bool(fromString("<b>"), src=e@\loc);
 
-		case (Expr) `(<Expr e>)`:
+		//brackets are only necessary for cst2ast conversion
+		case (Expr) `(<Expr e>)`: 
 			return cst2ast(e);
 		case (Expr) `!<Expr e>`:
 			return not(cst2ast(e), src=e@\loc);
